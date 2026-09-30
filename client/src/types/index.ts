@@ -37,6 +37,12 @@ export interface Room {
   active_users?: string[];
 }
 
+export interface MessageReaction {
+  emoji: string;
+  count: number;
+  reacted_by_me: boolean;
+}
+
 export interface Message {
   id: string;
   room_id: string;
@@ -44,6 +50,13 @@ export interface Message {
   created_at: string;
   anonymous_username: string;
   is_self: boolean;
+  reply_to?: string;
+  reply_preview?: {
+    id: string;
+    message: string;
+    anonymous_username: string;
+  };
+  reactions?: MessageReaction[];
 }
 
 export interface RoomMember {

@@ -145,6 +145,13 @@ export function broadcastMessageToRoom(
     created_at: string | Date;
     anonymous_username: string;
     sender_id: string;
+    reply_to?: string;
+    reply_preview?: {
+      id: string;
+      message: string;
+      anonymous_username: string;
+    };
+    reactions?: any[];
   }
 ): void {
   if (!io) return;
@@ -162,6 +169,50 @@ export function broadcastMessageToRoom(
         created_at: messageData.created_at,
         anonymous_username: messageData.anonymous_username,
         is_self: socket.userId === messageData.sender_id,
+        reply_to: messageData.reply_to,
+        reply_preview: messageData.reply_preview,
+        reactions: messageData.reactions || [],
+      });
+    }
+  }
+}
+
+export function broadcastReactionToRoom(
+  roomId: string,
+  messageId: string,
+  triggerUserId: string
+): void {
+  if (!io) return;
+
+  const roomSockets = io.sockets.adapter.rooms.get(roomId);
+  if (!roomSockets) return;
+
+  // For each socket in the room, fetch their personalized reaction view
+  for (const socketId of roomSockets) {
+    const socket = io.sockets.sockets.get(socketId) as AuthenticatedSocket | undefined;
+    if (socket && socket.userId) {
+      const viewerUserId = socket.userId;
+
+      // Async fetch personalized reactions for this viewer
+      pool.query(
+        `SELECT emoji, COUNT(*)::int AS count, bool_or(user_id = $1) AS reacted_by_me
+         FROM message_reactions WHERE message_id = $2
+         GROUP BY emoji ORDER BY emoji;`,
+        [viewerUserId, messageId]
+      ).then((result) => {
+        const reactions = result.rows.map((r: any) => ({
+          emoji: r.emoji,
+          count: r.count,
+          reacted_by_me: r.reacted_by_me,
+        }));
+
+        socket.emit('reaction_update', {
+          roomId,
+          messageId,
+          reactions,
+        });
+      }).catch((err) => {
+        console.error('Error broadcasting reaction:', err);
       });
     }
   }

@@ -115,10 +115,16 @@ export const api = {
   getRoomMessages: (roomId: string) =>
     request<{ messages: any[] }>(`/rooms/${roomId}/messages`),
 
-  sendMessage: (roomId: string, message: string) =>
+  sendMessage: (roomId: string, message: string, reply_to?: string) =>
     request<{ message: any }>(`/rooms/${roomId}/messages`, {
       method: 'POST',
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message, reply_to }),
+    }),
+
+  reactToMessage: (roomId: string, messageId: string, emoji: string) =>
+    request<{ action: 'added' | 'removed'; reactions: any[] }>(`/rooms/${roomId}/messages/${messageId}/react`, {
+      method: 'POST',
+      body: JSON.stringify({ emoji }),
     }),
 
   // Admin

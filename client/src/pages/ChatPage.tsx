@@ -12,17 +12,22 @@ import {
   Radio,
   Activity,
   Flame,
-  UserCheck
+  UserCheck,
+  Reply,
+  X,
+  SmilePlus
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { getSocket } from '../services/socket';
-import { Message, Room, RoomMember } from '../types';
+import { Message, Room, RoomMember, MessageReaction } from '../types';
 
 interface ChatPageProps {
   roomId: string;
   onNavigate: (tab: string) => void;
 }
+
+const QUICK_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🔥'];
 
 export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
   const { user } = useAuth();
@@ -44,9 +49,16 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
   const [showMembersDrawer, setShowMembersDrawer] = useState<boolean>(false);
   const [roomMembers, setRoomMembers] = useState<RoomMember[]>([]);
 
+  // Reply state
+  const [replyTo, setReplyTo] = useState<Message | null>(null);
+
+  // Reaction picker state
+  const [showEmojiPicker, setShowEmojiPicker] = useState<string | null>(null);
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
     messagesEndRef.current?.scrollIntoView({ behavior });
@@ -136,11 +148,24 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
       }
     };
 
+    const handleReactionUpdate = (data: { roomId: string; messageId: string; reactions: MessageReaction[] }) => {
+      if (data.roomId === roomId) {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === data.messageId
+              ? { ...msg, reactions: data.reactions }
+              : msg
+          )
+        );
+      }
+    };
+
     socket.on('connect', handleConnect);
     socket.on('disconnect', handleDisconnect);
     socket.on('new_message', handleNewMessage);
     socket.on('room_presence', handlePresence);
     socket.on('user_typing', handleUserTyping);
+    socket.on('reaction_update', handleReactionUpdate);
 
     if (socket.connected) {
       socket.emit('join_room', roomId);
@@ -153,6 +178,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
       socket.off('new_message', handleNewMessage);
       socket.off('room_presence', handlePresence);
       socket.off('user_typing', handleUserTyping);
+      socket.off('reaction_update', handleReactionUpdate);
     };
   }, [roomId]);
 
@@ -177,11 +203,13 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
     if (!inputMessage.trim() || sending) return;
 
     const text = inputMessage.trim();
+    const replyId = replyTo?.id;
     setInputMessage('');
+    setReplyTo(null);
     setSending(true);
 
     try {
-      await api.sendMessage(roomId, text);
+      await api.sendMessage(roomId, text, replyId);
       scrollToBottom('smooth');
     } catch (err: any) {
       setError(err.message || 'Failed to dispatch message.');
@@ -195,6 +223,27 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+    }
+  };
+
+  const handleReply = (msg: Message) => {
+    setReplyTo(msg);
+    setShowEmojiPicker(null);
+    inputRef.current?.focus();
+  };
+
+  const handleReact = async (messageId: string, emoji: string) => {
+    setShowEmojiPicker(null);
+    try {
+      const res = await api.reactToMessage(roomId, messageId, emoji);
+      // Update local state immediately for responsiveness
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId ? { ...msg, reactions: res.reactions } : msg
+        )
+      );
+    } catch (err: any) {
+      console.error('Failed to react:', err);
     }
   };
 
@@ -220,6 +269,15 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
   const liveUsersSet = new Set(activeUsers);
   const onlineMembersList = roomMembers.filter(m => liveUsersSet.has(m.anonymous_username));
   const offlineMembersList = roomMembers.filter(m => !liveUsersSet.has(m.anonymous_username));
+
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setShowEmojiPicker(null);
+    if (showEmojiPicker) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showEmojiPicker]);
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col bg-[#07090e] overflow-hidden">
@@ -412,16 +470,94 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
                       )}
                     </div>
 
+                    {/* Reply Preview Banner (if replying to another message) */}
+                    {msg.reply_preview && (
+                      <div className={`max-w-[85%] sm:max-w-[70%] mb-1 px-3 py-1.5 rounded-xl border border-white/[0.06] bg-slate-800/40 text-[11px] ${
+                        isSelf ? 'mr-0' : 'ml-0'
+                      }`}>
+                        <div className="flex items-center space-x-1.5">
+                          <Reply className="w-3 h-3 text-violet-400 shrink-0" />
+                          <span className="font-bold text-violet-300 font-mono truncate">
+                            {msg.reply_preview.anonymous_username}
+                          </span>
+                        </div>
+                        <p className="text-slate-400 truncate mt-0.5">
+                          {msg.reply_preview.message}
+                        </p>
+                      </div>
+                    )}
+
                     {/* Message Bubble */}
                     <div
-                      className={`max-w-[85%] sm:max-w-[70%] p-3.5 sm:p-4 rounded-2xl text-sm leading-relaxed break-words shadow-lg transition-all ${
+                      className={`relative max-w-[85%] sm:max-w-[70%] p-3.5 sm:p-4 rounded-2xl text-sm leading-relaxed break-words shadow-lg transition-all ${
                         isSelf
                           ? 'bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-700 text-white rounded-tr-sm shadow-violet-600/15'
                           : 'glass-card border border-white/10 text-slate-100 rounded-tl-sm'
                       }`}
                     >
                       <p className="whitespace-pre-wrap">{msg.message}</p>
+
+                      {/* Hover actions: React + Reply */}
+                      <div className={`absolute ${isSelf ? 'left-0 -translate-x-full pl-0 pr-1.5' : 'right-0 translate-x-full pr-0 pl-1.5'} top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1`}>
+                        <button
+                          onClick={() => handleReply(msg)}
+                          className="p-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 border border-white/10 text-slate-300 hover:text-white transition-all"
+                          title="Reply"
+                        >
+                          <Reply className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowEmojiPicker(showEmojiPicker === msg.id ? null : msg.id);
+                          }}
+                          className="p-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 border border-white/10 text-slate-300 hover:text-white transition-all"
+                          title="React"
+                        >
+                          <SmilePlus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Emoji Picker Popup */}
+                      {showEmojiPicker === msg.id && (
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className={`absolute ${isSelf ? 'right-0' : 'left-0'} -bottom-12 z-20 flex items-center space-x-1 p-1.5 rounded-xl bg-slate-800 border border-white/15 shadow-2xl`}
+                        >
+                          {QUICK_EMOJIS.map((emoji) => (
+                            <button
+                              key={emoji}
+                              onClick={() => handleReact(msg.id, emoji)}
+                              className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-base transition-all hover:scale-125"
+                              title={emoji}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
+
+                    {/* Reactions row */}
+                    {msg.reactions && msg.reactions.length > 0 && (
+                      <div className="flex flex-wrap items-center gap-1 mt-1 px-1">
+                        {msg.reactions.map((r) => (
+                          <button
+                            key={r.emoji}
+                            onClick={() => handleReact(msg.id, r.emoji)}
+                            className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-xs border transition-all ${
+                              r.reacted_by_me
+                                ? 'bg-violet-600/25 border-violet-500/50 text-violet-200 shadow-sm shadow-violet-500/15'
+                                : 'bg-slate-800/60 border-white/[0.08] text-slate-300 hover:bg-slate-700/60'
+                            }`}
+                            title={`${r.count} reaction${r.count > 1 ? 's' : ''}`}
+                          >
+                            <span>{r.emoji}</span>
+                            <span className="font-mono font-semibold text-[10px]">{r.count}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
 
                     {/* Timestamp */}
                     <div className="flex items-center space-x-1 px-1 mt-1 text-[10px] text-slate-400">
@@ -452,17 +588,41 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
             </div>
           )}
 
+          {/* Reply-To Preview Bar */}
+          {replyTo && (
+            <div className="mx-4 sm:mx-5 mb-0 p-3 rounded-t-xl bg-slate-800/80 border border-b-0 border-white/[0.08] flex items-center justify-between">
+              <div className="flex items-center space-x-2 min-w-0">
+                <Reply className="w-4 h-4 text-violet-400 shrink-0" />
+                <div className="min-w-0">
+                  <span className="text-[11px] font-bold text-violet-300 font-mono block">
+                    Replying to {replyTo.anonymous_username}
+                  </span>
+                  <p className="text-[11px] text-slate-400 truncate max-w-md">
+                    {replyTo.message}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setReplyTo(null)}
+                className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
           {/* Bottom Message Input Bar */}
-          <div className="p-4 sm:p-5 glass-panel border-t border-white/[0.08] bg-[#090d18]/90">
+          <div className={`p-4 sm:p-5 glass-panel border-t border-white/[0.08] bg-[#090d18]/90 ${replyTo ? 'pt-2' : ''}`}>
             <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto flex items-end space-x-3">
               <div className="flex-1 relative">
                 <textarea
+                  ref={inputRef}
                   id="chat-message-input"
                   rows={1}
                   value={inputMessage}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
-                  placeholder={`Message #${room?.name || 'room'} anonymously... (Press Enter to send, Shift+Enter for newline)`}
+                  placeholder={replyTo ? `Reply to ${replyTo.anonymous_username}...` : `Message #${room?.name || 'room'} anonymously... (Press Enter to send, Shift+Enter for newline)`}
                   maxLength={2000}
                   className="w-full px-4 py-3 rounded-2xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all resize-none max-h-32"
                 />
