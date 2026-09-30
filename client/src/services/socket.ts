@@ -5,9 +5,10 @@ let socketInstance: Socket | null = null;
 
 export function getSocket(): Socket {
   const token = getStoredToken();
+  const socketUrl = import.meta.env.VITE_WS_URL || import.meta.env.VITE_API_URL || window.location.origin;
 
   if (!socketInstance) {
-    socketInstance = io(window.location.origin, {
+    socketInstance = io(socketUrl, {
       path: '/socket.io',
       auth: { token },
       autoConnect: true,
