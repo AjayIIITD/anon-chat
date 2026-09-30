@@ -33,3 +33,5 @@ logs/
 *.suo
 *.ntvs*
 *.njsproj
+.vercel
+.env*
