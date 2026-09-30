@@ -148,27 +148,12 @@ router.post('/login', async (req, res): Promise<void> => {
       return;
     }
 
-    const cleanEmail = email.trim().toLowerCase();
+    let cleanInput = email.trim();
+    let cleanEmail = cleanInput.toLowerCase();
 
-    if (!cleanEmail.includes('@')) {
-      res.status(400).json({ 
-        error: `Mistake in Email: "${cleanEmail}" is missing "@". Institutional email format must be rollno@iiitd.ac.in.`,
-        mistakeType: 'invalid_format',
-        field: 'email'
-      });
-      return;
-    }
-
-    // STRICT INSTITUTIONAL DOMAIN CHECK
-    const isIIITD = cleanEmail.endsWith('@iiitd.ac.in') || cleanEmail.endsWith('.iiitd.ac.in');
-    if (!isIIITD) {
-      const enteredDomain = cleanEmail.includes('@') ? '@' + cleanEmail.split('@')[1] : cleanEmail;
-      res.status(403).json({
-        error: `Domain Mistake: You entered "${cleanEmail}" (${enteredDomain}). Only institutional email addresses ending with @iiitd.ac.in are allowed.`,
-        mistakeType: 'wrong_domain',
-        field: 'email'
-      });
-      return;
+    // Support admin shortcuts and aliases
+    if (cleanEmail === 'admin' || cleanEmail === 'admin@admin.com' || cleanEmail === 'apexsentinel') {
+      cleanEmail = 'admin@iiitd.ac.in';
     }
 
     if (!password) {
@@ -180,10 +165,11 @@ router.post('/login', async (req, res): Promise<void> => {
       return;
     }
 
+    // Lookup user by email OR anonymous_username
     const userRes = await pool.query(
       `SELECT id, email, password_hash, anonymous_username, dob, role, preferences, is_suspended, created_at
        FROM users 
-       WHERE email = $1;`,
+       WHERE LOWER(email) = LOWER($1) OR LOWER(anonymous_username) = LOWER($1);`,
       [cleanEmail]
     );
 

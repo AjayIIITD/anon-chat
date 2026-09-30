@@ -53,31 +53,35 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
       return;
     }
 
-    // 3. Mistake: Email format lacks '@'
-    if (!cleanEmail.includes('@')) {
-      setMistake({
-        title: 'Invalid Email Format',
-        message: `The email "${cleanEmail}" is missing an "@" symbol. Institutional email format must be rollno@iiitd.ac.in.`,
-        field: 'email',
-        mistakeType: 'invalid_format',
-        emailHint: 'Missing "@" symbol in email',
-      });
-      return;
-    }
-
-    // 4. Mistake: Domain is not @iiitd.ac.in
     const lowerEmail = cleanEmail.toLowerCase();
-    const isIIITD = lowerEmail.endsWith('@iiitd.ac.in') || lowerEmail.endsWith('.iiitd.ac.in');
-    if (!isIIITD) {
-      const enteredDomain = lowerEmail.includes('@') ? '@' + lowerEmail.split('@')[1] : lowerEmail;
-      setMistake({
-        title: 'Domain Mistake',
-        message: `You entered "${cleanEmail}" with domain "${enteredDomain}". Only official IIIT-Delhi student accounts ending with @iiitd.ac.in are allowed.`,
-        field: 'email',
-        mistakeType: 'wrong_domain',
-        emailHint: `Domain "${enteredDomain}" is not permitted. Must end with @iiitd.ac.in`,
-      });
-      return;
+    const isSpecialLogin = lowerEmail === 'admin' || lowerEmail === 'admin@admin.com' || lowerEmail === 'apexsentinel';
+
+    if (!isSpecialLogin) {
+      // 3. Mistake: Email format lacks '@'
+      if (!cleanEmail.includes('@')) {
+        setMistake({
+          title: 'Invalid Email Format',
+          message: `The email "${cleanEmail}" is missing an "@" symbol. Institutional email format must be rollno@iiitd.ac.in.`,
+          field: 'email',
+          mistakeType: 'invalid_format',
+          emailHint: 'Missing "@" symbol in email',
+        });
+        return;
+      }
+
+      // 4. Mistake: Domain is not @iiitd.ac.in
+      const isIIITD = lowerEmail.endsWith('@iiitd.ac.in') || lowerEmail.endsWith('.iiitd.ac.in');
+      if (!isIIITD) {
+        const enteredDomain = lowerEmail.includes('@') ? '@' + lowerEmail.split('@')[1] : lowerEmail;
+        setMistake({
+          title: 'Domain Mistake',
+          message: `You entered "${cleanEmail}" with domain "${enteredDomain}". Only official IIIT-Delhi student accounts ending with @iiitd.ac.in are allowed.`,
+          field: 'email',
+          mistakeType: 'wrong_domain',
+          emailHint: `Domain "${enteredDomain}" is not permitted. Must end with @iiitd.ac.in`,
+        });
+        return;
+      }
     }
 
     // 5. Mistake: Password is empty
