@@ -2,9 +2,18 @@ const API_BASE = '/api';
 
 export class ApiError extends Error {
   status: number;
-  constructor(message: string, status: number) {
+  data?: any;
+  field?: string;
+  suggestion?: string;
+  mistakeType?: string;
+
+  constructor(message: string, status: number, data?: any) {
     super(message);
     this.status = status;
+    this.data = data;
+    this.field = data?.field;
+    this.suggestion = data?.suggestion;
+    this.mistakeType = data?.mistakeType;
     this.name = 'ApiError';
   }
 }
@@ -39,7 +48,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
   if (!response.ok) {
     const errorMsg = data.error || data.message || `Request failed with status ${response.status}`;
-    throw new ApiError(errorMsg, response.status);
+    throw new ApiError(errorMsg, response.status, data);
   }
 
   return data as T;
@@ -53,7 +62,7 @@ export const api = {
       body: JSON.stringify({ preferences }),
     }),
 
-  signup: (payload: { email: string; password: string; preferences: any; chosen_username?: string }) =>
+  signup: (payload: { email: string; password: string; dob?: string; preferences: any; chosen_username?: string }) =>
     request<{ message: string; token: string; user: any }>('/auth/signup', {
       method: 'POST',
       body: JSON.stringify(payload),

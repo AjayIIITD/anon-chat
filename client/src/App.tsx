@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
+import { LogoutConfirmModal } from './components/LogoutConfirmModal';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
@@ -10,7 +11,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { AdminPage } from './pages/AdminPage';
 
 function AppContent() {
-  const { user, loading } = useAuth();
+  const { user, loading, isLogoutModalOpen, closeLogoutModal, logout } = useAuth();
   const [currentTab, setCurrentTab] = useState<string>('landing');
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
 
@@ -48,9 +49,13 @@ function AppContent() {
 
     if (!loading) {
       if (user) {
-        setCurrentTab('dashboard');
+        if (currentTab === 'landing' || currentTab === 'login' || currentTab === 'signup') {
+          setCurrentTab('dashboard');
+        }
       } else {
-        setCurrentTab('landing');
+        if (currentTab === 'dashboard' || currentTab === 'chat' || currentTab === 'profile' || currentTab === 'admin') {
+          setCurrentTab('login');
+        }
       }
     }
   }, [loading, user]);
@@ -65,6 +70,12 @@ function AppContent() {
       window.history.pushState({}, '', `/${tab === 'landing' ? '' : tab}`);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleConfirmLogout = () => {
+    logout();
+    closeLogoutModal();
+    navigateTo('login');
   };
 
   // Handle browser back/forward navigation
@@ -108,6 +119,13 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col selection:bg-violet-500/30 selection:text-violet-200">
       <Navbar currentTab={currentTab} onNavigate={navigateTo} />
+
+      <LogoutConfirmModal
+        isOpen={isLogoutModalOpen}
+        onClose={closeLogoutModal}
+        onConfirm={handleConfirmLogout}
+        user={user}
+      />
 
       <main className="flex-1">
         {currentTab === 'landing' && (

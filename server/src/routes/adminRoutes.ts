@@ -154,12 +154,14 @@ router.delete('/rooms/:id', async (req: AuthenticatedRequest, res: Response): Pr
   }
 });
 
-// View all users (Privacy enforced: NO emails or auth passwords!)
+// View all users (Includes student email and DOB for administrator oversight)
 router.get('/users', async (_req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const query = `
       SELECT 
         u.id,
+        u.email,
+        u.dob,
         u.anonymous_username,
         u.role,
         u.is_suspended,

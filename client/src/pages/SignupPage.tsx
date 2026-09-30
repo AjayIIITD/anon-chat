@@ -9,7 +9,11 @@ import {
   RefreshCw, 
   Check, 
   AlertCircle,
-  EyeOff
+  EyeOff,
+  GraduationCap,
+  CheckCircle2,
+  Calendar,
+  X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
@@ -39,6 +43,7 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
 
   const [step, setStep] = useState<number>(1);
   const [email, setEmail] = useState('');
+  const [dob, setDob] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
@@ -91,7 +96,25 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
     setError(null);
 
     if (!email || !email.includes('@')) {
-      setError('Please provide a valid email address.');
+      setError('Please provide a valid IIIT-Delhi email address.');
+      return;
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail.endsWith('@iiitd.ac.in') && !cleanEmail.endsWith('.iiitd.ac.in')) {
+      setError(`Registration Denied: Only institutional email addresses ending with @iiitd.ac.in are authorized. ("${cleanEmail}" is not permitted)`);
+      return;
+    }
+
+    if (!dob) {
+      setError('Please provide your Date of Birth (DOB).');
+      return;
+    }
+
+    const birthDate = new Date(dob);
+    const today = new Date();
+    if (isNaN(birthDate.getTime()) || birthDate >= today) {
+      setError('Please enter a valid Date of Birth.');
       return;
     }
 
@@ -126,8 +149,9 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
       };
 
       await signup({
-        email,
+        email: email.trim().toLowerCase(),
         password,
+        dob,
         preferences,
         chosen_username: previewUsername,
       });
@@ -182,7 +206,7 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
                 Create Secure Account
               </h2>
               <p className="text-xs text-slate-400">
-                Your email is used for persistent recovery only.
+                Register with your official IIIT-Delhi institutional email.
               </p>
             </div>
 
@@ -195,9 +219,14 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">
-                Email Address
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                  IIIT-Delhi Student Email
+                </label>
+                <span className="text-[10px] font-mono font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                  @iiitd.ac.in
+                </span>
+              </div>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
                 <input
@@ -206,8 +235,32 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/60 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all"
+                  placeholder="rollno@iiitd.ac.in"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/60 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all font-mono"
+                />
+              </div>
+            </div>
+
+            {/* Date of Birth (DOB) */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                  Date of Birth (DOB)
+                </label>
+                <span className="text-[10px] font-medium text-slate-400">
+                  Strictly Confidential
+                </span>
+              </div>
+              <div className="relative">
+                <Calendar className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                <input
+                  id="signup-dob-input"
+                  type="date"
+                  required
+                  max={new Date().toISOString().split('T')[0]}
+                  value={dob}
+                  onChange={(e) => setDob(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/60 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all font-mono text-xs"
                 />
               </div>
             </div>

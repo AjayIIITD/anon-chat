@@ -8,7 +8,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate }) => {
-  const { user, logout } = useAuth();
+  const { user, openLogoutModal } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 w-full glass-panel border-b border-white/[0.07] bg-[#070a12]/80 backdrop-blur-xl">
@@ -95,7 +95,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate }) => {
               {/* Logout */}
               <button
                 id="nav-logout-btn"
-                onClick={logout}
+                onClick={openLogoutModal}
                 title="Log out"
                 className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all"
               >

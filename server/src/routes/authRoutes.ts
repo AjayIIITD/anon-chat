@@ -19,13 +19,29 @@ router.post('/preview-username', async (req, res): Promise<void> => {
   }
 });
 
-// Signup
+// Standard Email/Password Signup (strictly @iiitd.ac.in, requires DOB)
 router.post('/signup', async (req, res): Promise<void> => {
   try {
-    const { email, password, preferences, chosen_username } = req.body;
+    const { email, password, dob, preferences, chosen_username } = req.body;
 
     if (!email || !email.includes('@')) {
-      res.status(400).json({ error: 'A valid email address is required for account authentication.' });
+      res.status(400).json({ error: 'A valid IIIT-Delhi email address (@iiitd.ac.in) is required.' });
+      return;
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+
+    // STRICT INSTITUTIONAL DOMAIN CHECK: Must end with @iiitd.ac.in or .iiitd.ac.in
+    const isIIITD = cleanEmail.endsWith('@iiitd.ac.in') || cleanEmail.endsWith('.iiitd.ac.in');
+    if (!isIIITD) {
+      res.status(403).json({
+        error: `Registration Denied: Only institutional email addresses ending with @iiitd.ac.in are authorized. ("${cleanEmail}" is not permitted)`,
+      });
+      return;
+    }
+
+    if (!dob || typeof dob !== 'string' || !dob.trim()) {
+      res.status(400).json({ error: 'Date of Birth (DOB) is required for registration.' });
       return;
     }
 
@@ -33,8 +49,6 @@ router.post('/signup', async (req, res): Promise<void> => {
       res.status(400).json({ error: 'Password must be at least 8 characters long.' });
       return;
     }
-
-    const cleanEmail = email.trim().toLowerCase();
 
     // Check if email already registered
     const existing = await pool.query('SELECT id FROM users WHERE email = $1;', [cleanEmail]);
@@ -65,13 +79,15 @@ router.post('/signup', async (req, res): Promise<void> => {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     const safePreferences = preferences || { interests: [], vibe: 'chill', topics: [] };
+    const cleanDob = dob.trim();
+    safePreferences.dob = cleanDob;
 
-    // Insert user
+    // Insert user with DOB
     const insertRes = await pool.query(
-      `INSERT INTO users (email, password_hash, anonymous_username, preferences, role)
-       VALUES ($1, $2, $3, $4, 'user')
-       RETURNING id, anonymous_username, role, preferences, created_at;`,
-      [cleanEmail, passwordHash, anonymousUsername, JSON.stringify(safePreferences)]
+      `INSERT INTO users (email, password_hash, anonymous_username, dob, preferences, role)
+       VALUES ($1, $2, $3, $4, $5, 'user')
+       RETURNING id, email, anonymous_username, dob, role, preferences, created_at;`,
+      [cleanEmail, passwordHash, anonymousUsername, cleanDob, JSON.stringify(safePreferences)]
     );
 
     const newUser = insertRes.rows[0];
@@ -95,7 +111,9 @@ router.post('/signup', async (req, res): Promise<void> => {
       token,
       user: {
         id: newUser.id,
+        email: newUser.email,
         anonymous_username: newUser.anonymous_username,
+        dob: newUser.dob,
         role: newUser.role,
         preferences: newUser.preferences,
         created_at: newUser.created_at,
@@ -107,40 +125,107 @@ router.post('/signup', async (req, res): Promise<void> => {
   }
 });
 
-// Login
+// Standard Email/Password Login (strictly @iiitd.ac.in)
 router.post('/login', async (req, res): Promise<void> => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      res.status(400).json({ error: 'Email and password are required.' });
+    if (!email && !password) {
+      res.status(400).json({ 
+        error: 'Mistake: Both email and password fields are empty. Please enter your credentials.',
+        mistakeType: 'empty_form',
+        field: 'all'
+      });
+      return;
+    }
+
+    if (!email || !email.trim()) {
+      res.status(400).json({ 
+        error: 'Mistake in Email: Email field is empty. Please enter your IIIT-Delhi student email.',
+        mistakeType: 'empty_email',
+        field: 'email'
+      });
       return;
     }
 
     const cleanEmail = email.trim().toLowerCase();
 
+    if (!cleanEmail.includes('@')) {
+      res.status(400).json({ 
+        error: `Mistake in Email: "${cleanEmail}" is missing "@". Institutional email format must be rollno@iiitd.ac.in.`,
+        mistakeType: 'invalid_format',
+        field: 'email'
+      });
+      return;
+    }
+
+    // STRICT INSTITUTIONAL DOMAIN CHECK
+    const isIIITD = cleanEmail.endsWith('@iiitd.ac.in') || cleanEmail.endsWith('.iiitd.ac.in');
+    if (!isIIITD) {
+      const enteredDomain = cleanEmail.includes('@') ? '@' + cleanEmail.split('@')[1] : cleanEmail;
+      res.status(403).json({
+        error: `Domain Mistake: You entered "${cleanEmail}" (${enteredDomain}). Only institutional email addresses ending with @iiitd.ac.in are allowed.`,
+        mistakeType: 'wrong_domain',
+        field: 'email'
+      });
+      return;
+    }
+
+    if (!password) {
+      res.status(400).json({ 
+        error: 'Mistake in Password: Password field is empty. Please enter your password.',
+        mistakeType: 'empty_password',
+        field: 'password'
+      });
+      return;
+    }
+
     const userRes = await pool.query(
-      `SELECT id, password_hash, anonymous_username, role, preferences, is_suspended, created_at
+      `SELECT id, email, password_hash, anonymous_username, dob, role, preferences, is_suspended, created_at
        FROM users 
        WHERE email = $1;`,
       [cleanEmail]
     );
 
     if (userRes.rows.length === 0) {
-      res.status(401).json({ error: 'Invalid email or password.' });
+      res.status(404).json({ 
+        error: `Account Not Found: No student account registered with "${cleanEmail}". Check for typos in your roll number or create an account.`,
+        mistakeType: 'unregistered_email',
+        field: 'email',
+        suggestion: 'signup'
+      });
       return;
     }
 
     const user = userRes.rows[0];
 
     if (user.is_suspended) {
-      res.status(403).json({ error: 'Your account has been suspended by an administrator.' });
+      res.status(403).json({ 
+        error: 'Account Suspended: Your account has been suspended by an administrator.',
+        mistakeType: 'suspended',
+        field: 'general'
+      });
+      return;
+    }
+
+    // If account was created via Google OAuth
+    if (user.password_hash === 'GOOGLE_OAUTH_VERIFIED') {
+      res.status(400).json({ 
+        error: `Notice: This account ("${cleanEmail}") was created using Google OAuth, which has been removed. Please register a password account using the Sign Up page.`,
+        mistakeType: 'use_google_oauth',
+        field: 'email',
+        suggestion: 'signup'
+      });
       return;
     }
 
     const validPass = await bcrypt.compare(password, user.password_hash);
     if (!validPass) {
-      res.status(401).json({ error: 'Invalid email or password.' });
+      res.status(401).json({ 
+        error: `Password Mistake: The password for "${cleanEmail}" is incorrect. Check Caps Lock or re-type your password.`,
+        mistakeType: 'incorrect_password',
+        field: 'password'
+      });
       return;
     }
 
@@ -151,7 +236,9 @@ router.post('/login', async (req, res): Promise<void> => {
       token,
       user: {
         id: user.id,
+        email: user.email,
         anonymous_username: user.anonymous_username,
+        dob: user.dob,
         role: user.role,
         preferences: user.preferences,
         created_at: user.created_at,
@@ -163,11 +250,11 @@ router.post('/login', async (req, res): Promise<void> => {
   }
 });
 
-// Get current user profile
+// Get current user profile (includes own email and DOB strictly for personal display)
 router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const userRes = await pool.query(
-      `SELECT id, anonymous_username, role, preferences, created_at, is_suspended
+      `SELECT id, email, anonymous_username, dob, role, preferences, created_at, is_suspended
        FROM users 
        WHERE id = $1;`,
       [req.user!.id]
@@ -193,7 +280,9 @@ router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res: Resp
     res.json({
       user: {
         id: user.id,
+        email: user.email,
         anonymous_username: user.anonymous_username,
+        dob: user.dob,
         role: user.role,
         preferences: user.preferences,
         created_at: user.created_at,
@@ -206,27 +295,11 @@ router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res: Resp
   }
 });
 
-// Regenerate Anonymous Username
+// Regenerate Anonymous Username (disabled: persona locked once generated)
 router.post('/regenerate-username', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-  try {
-    const user = req.user!;
-    const newUsername = await generateUniqueAnonymousUsername(user.preferences || {});
-
-    await pool.query(
-      `UPDATE users 
-       SET anonymous_username = $1, updated_at = NOW() 
-       WHERE id = $2;`,
-      [newUsername, user.id]
-    );
-
-    res.json({
-      message: 'Anonymous identity regenerated successfully.',
-      anonymous_username: newUsername,
-    });
-  } catch (error) {
-    console.error('Regenerate username error:', error);
-    res.status(500).json({ error: 'Failed to regenerate anonymous username.' });
-  }
+  res.status(403).json({
+    error: 'Anonymous identity is permanent once generated and cannot be regenerated.',
+  });
 });
 
 // Update Preferences

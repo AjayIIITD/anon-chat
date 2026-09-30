@@ -1,27 +1,24 @@
 import React, { useState } from 'react';
 import { 
-  User as UserIcon, 
   Sparkles, 
   Calendar, 
   Compass, 
   LogOut, 
-  RefreshCw, 
   ShieldCheck, 
   Lock, 
-  Check, 
-  AlertCircle,
-  ArrowRight
+  ArrowRight,
+  GraduationCap,
+  CheckCircle2,
+  Mail
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { RegenerateUsernameModal } from '../components/RegenerateUsernameModal';
 
 interface ProfilePageProps {
   onNavigate: (tab: string, roomId?: string) => void;
 }
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({ onNavigate }) => {
-  const { user, logout, updatePreferences } = useAuth();
-  const [isRegenerateOpen, setIsRegenerateOpen] = useState(false);
+  const { user, openLogoutModal, updatePreferences } = useAuth();
   const [editingPrefs, setEditingPrefs] = useState(false);
   const [vibe, setVibe] = useState(user?.preferences?.vibe || 'chill');
   const [loading, setLoading] = useState(false);
@@ -55,23 +52,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onNavigate }) => {
         day: 'numeric',
       });
     } catch {
-      return 'Unknown';
+      return dateStr || 'Unknown';
     }
   };
 
+  const isIIITDStudent = user.email?.toLowerCase().endsWith('iiitd.ac.in');
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
-      <RegenerateUsernameModal
-        isOpen={isRegenerateOpen}
-        onClose={() => setIsRegenerateOpen(false)}
-      />
-
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold text-white tracking-tight">
-          Anonymous Persona
+          Personal Account & Persona
         </h1>
         <p className="text-sm text-slate-400 mt-1">
-          Your persistent incognito profile across all AnonChat rooms
+          Your persistent account credentials and public anonymous identity
         </p>
       </div>
 
@@ -91,9 +85,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            <div className="space-y-1 mb-6">
+            <div className="space-y-1 mb-4">
               <span className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block">
-                Active Pseudonym
+                Public Pseudonym in Rooms
               </span>
               <h2 className="font-mono text-xl font-bold text-white tracking-wide">
                 {user.anonymous_username}
@@ -103,36 +97,100 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onNavigate }) => {
               </span>
             </div>
 
-            <button
-              id="profile-regenerate-username-btn"
-              onClick={() => setIsRegenerateOpen(true)}
-              className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 hover:border-violet-500/40 text-slate-200 text-xs font-semibold transition-all"
-            >
-              <RefreshCw className="w-3.5 h-3.5 text-violet-400" />
-              <span>Regenerate Identity</span>
-            </button>
+            {/* Permanent Locked Anonymous Name Indicator */}
+            <div className="pt-2">
+              <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-white/[0.08] text-[11px] text-slate-300 font-medium">
+                <Lock className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Permanent Anonymous Identity</span>
+              </span>
+            </div>
           </div>
 
           {/* Privacy Seal */}
           <div className="glass-card p-5 rounded-2xl border border-emerald-500/20 text-xs text-slate-300 space-y-2">
             <div className="flex items-center space-x-2 text-emerald-400 font-bold">
               <ShieldCheck className="w-4 h-4" />
-              <span>Zero Leak Enforcement</span>
+              <span>Zero-Leak Room Isolation</span>
             </div>
             <p className="text-[11px] leading-relaxed text-slate-400">
-              Your real email address and authentication credentials are encrypted and isolated. They will never be transmitted to other users.
+              Other students and room participants only ever see <span className="text-cyan-300 font-mono font-semibold">{user.anonymous_username}</span>. Your real email and credentials are never transmitted over room APIs.
             </p>
           </div>
         </div>
 
-        {/* Right Column: Preferences, Joined Rooms & Security */}
+        {/* Right Column: Personal Authentication Details & Preferences */}
         <div className="md:col-span-2 space-y-6">
-          {/* Identity Parameters */}
+          {/* PERSONAL AUTHENTICATION CREDENTIALS (Visible strictly to user) */}
+          <div className="glass-panel p-6 rounded-3xl border border-cyan-500/30 shadow-lg shadow-cyan-950/20 space-y-4">
+            <div className="flex items-center justify-between border-b border-white/[0.07] pb-3">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                  <GraduationCap className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white tracking-tight">
+                    Personal Authentication Account
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Your institutional sign-in data stored persistently
+                  </p>
+                </div>
+              </div>
+
+              <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 font-mono">
+                Private To You
+              </span>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-900/80 border border-white/[0.08] space-y-2.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <span className="text-xs text-slate-400 flex items-center space-x-1.5">
+                  <Mail className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Student Email Address:</span>
+                </span>
+                <span className="text-xs font-mono font-bold text-cyan-300 bg-cyan-950/40 px-2.5 py-1 rounded-lg border border-cyan-500/20">
+                  {user.email || 'None on record'}
+                </span>
+              </div>
+
+              {/* Date of Birth (DOB) */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-1.5 border-t border-white/[0.06]">
+                <span className="text-xs text-slate-400 flex items-center space-x-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-violet-400" />
+                  <span>Date of Birth (DOB):</span>
+                </span>
+                <span className="text-xs font-mono font-semibold text-slate-200 bg-white/[0.04] px-2.5 py-1 rounded-lg border border-white/[0.08]">
+                  {user.dob ? formatDate(user.dob) : (user.preferences?.dob ? formatDate(user.preferences.dob) : 'Not specified')}
+                </span>
+              </div>
+
+              {isIIITDStudent ? (
+                <div className="flex items-center space-x-2 text-xs text-emerald-400 font-semibold pt-1">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Verified IIIT-Delhi Institutional Student (@iiitd.ac.in)</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2 text-xs text-violet-300 font-medium pt-1">
+                  <Lock className="w-4 h-4 text-violet-400 shrink-0" />
+                  <span>Persistent Authentication Account</span>
+                </div>
+              )}
+            </div>
+
+            <div className="p-3 rounded-xl bg-violet-950/20 border border-violet-500/20 text-xs text-slate-300 space-y-1">
+              <span className="text-violet-300 font-bold block text-[11px]">Permanent Persistence:</span>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                When you log in next time with this account (<strong className="text-slate-200">{user.email}</strong>), your persistent persona (<strong className="text-cyan-300 font-mono">{user.anonymous_username}</strong>), preferences, joined rooms, and conversation messages remain 100% the same.
+              </p>
+            </div>
+          </div>
+
+          {/* Persona Preferences */}
           <div className="glass-panel p-6 rounded-3xl border border-white/10 space-y-6">
             <div className="flex items-center justify-between border-b border-white/[0.07] pb-4">
               <div>
                 <h3 className="text-base font-bold text-white tracking-tight">Persona Attributes</h3>
-                <p className="text-xs text-slate-400">Underlying preferences used to match identity</p>
+                <p className="text-xs text-slate-400">Preferences used to generate anonymous identity</p>
               </div>
 
               <button
@@ -176,7 +234,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onNavigate }) => {
                   Selected Interests
                 </span>
                 <div className="flex flex-wrap gap-2">
-                  {(user.preferences?.interests || ['Programming', 'Coffee']).map((item: string) => (
+                  {(user.preferences?.interests || ['Tech', 'Campus', 'Programming']).map((item: string) => (
                     <span
                       key={item}
                       className="px-2.5 py-1 rounded-lg bg-slate-900/80 border border-cyan-500/20 text-cyan-300 text-xs font-medium"
@@ -209,7 +267,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onNavigate }) => {
 
             <div className="flex items-center space-x-2 text-xs text-slate-400">
               <Calendar className="w-4 h-4 text-violet-400" />
-              <span>Identity created on {formatDate(user.created_at)}</span>
+              <span>Identity registered on {formatDate(user.created_at)}</span>
             </div>
 
             <div>
@@ -249,7 +307,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onNavigate }) => {
           <div className="flex justify-end pt-2">
             <button
               id="profile-logout-btn"
-              onClick={logout}
+              onClick={openLogoutModal}
               className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 text-xs font-semibold transition-all"
             >
               <LogOut className="w-4 h-4" />

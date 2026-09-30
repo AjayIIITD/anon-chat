@@ -9,8 +9,11 @@ interface AuthContextType {
   loading: boolean;
   error: string | null;
   login: (email: string, pass: string) => Promise<void>;
-  signup: (payload: { email: string; password: string; preferences: UserPreferences; chosen_username?: string }) => Promise<void>;
+  signup: (payload: { email: string; password: string; dob?: string; preferences: UserPreferences; chosen_username?: string }) => Promise<void>;
   logout: () => void;
+  isLogoutModalOpen: boolean;
+  openLogoutModal: () => void;
+  closeLogoutModal: () => void;
   regenerateUsername: () => Promise<string>;
   updatePreferences: (preferences: UserPreferences) => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -24,8 +27,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(getStoredToken());
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState<boolean>(false);
 
   const clearError = () => setError(null);
+  const openLogoutModal = () => setIsLogoutModalOpen(true);
+  const closeLogoutModal = () => setIsLogoutModalOpen(false);
 
   // Initialize and verify authentication on app load
   useEffect(() => {
@@ -69,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signup = async (payload: { email: string; password: string; preferences: UserPreferences; chosen_username?: string }) => {
+  const signup = async (payload: { email: string; password: string; dob?: string; preferences: UserPreferences; chosen_username?: string }) => {
     setLoading(true);
     setError(null);
     try {
@@ -91,6 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setToken(null);
     setError(null);
+    setIsLogoutModalOpen(false);
   };
 
   const regenerateUsername = async (): Promise<string> => {
@@ -137,6 +144,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         signup,
         logout,
+        isLogoutModalOpen,
+        openLogoutModal,
+        closeLogoutModal,
         regenerateUsername,
         updatePreferences,
         refreshProfile,

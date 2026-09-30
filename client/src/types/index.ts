@@ -4,10 +4,13 @@ export interface UserPreferences {
   topics: string[];
   conversationStyle?: string;
   ageRange?: string;
+  dob?: string;
 }
 
 export interface User {
   id: string;
+  email?: string;
+  dob?: string;
   anonymous_username: string;
   role: 'user' | 'admin';
   preferences: UserPreferences;

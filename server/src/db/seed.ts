@@ -53,8 +53,8 @@ async function seedDatabase() {
     console.log(`✅ Seeded ${rooms.length} default chat rooms.`);
 
     // 2. Seed Admin User
-    const adminEmail = 'admin@anonchat.internal';
-    const adminPass = 'AdminPassword123!';
+    const adminEmail = 'admin@iiitd.ac.in';
+    const adminPass = 'ajay@admin_20170';
     const adminHash = await bcrypt.hash(adminPass, 10);
     const adminPrefs = JSON.stringify({
       interests: ['Architecture', 'Security', 'Engineering'],
@@ -71,7 +71,7 @@ async function seedDatabase() {
       [adminEmail, adminHash, adminPrefs]
     );
     const adminId = adminRes.rows[0].id;
-    console.log(`✅ Admin account initialized: ${adminEmail} (password: ${adminPass})`);
+    console.log(`✅ Admin account initialized: ${adminEmail} (password protected with bcrypt hash)`);
 
     // 3. Seed Demo / Test User
     const userEmail = 'quietpixel@anonchat.internal';
@@ -92,7 +92,7 @@ async function seedDatabase() {
       [userEmail, userHash, userPrefs]
     );
     const userId = userRes.rows[0].id;
-    console.log(`✅ Demo user initialized: ${userEmail} (password: ${userPass})`);
+    console.log(`✅ Demo user initialized: ${userEmail} (password protected with bcrypt hash)`);
 
     // 4. Join user to General & Programming
     if (roomMap['General'] && roomMap['Programming']) {
