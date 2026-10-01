@@ -5,7 +5,9 @@ let socketInstance: Socket | null = null;
 
 export function getSocket(): Socket {
   const token = getStoredToken();
-  const socketUrl = import.meta.env.VITE_WS_URL || import.meta.env.VITE_API_URL || window.location.origin;
+  const PROD_BACKEND_URL = 'https://anon-chat-ohws.onrender.com';
+  const defaultBase = import.meta.env.PROD ? PROD_BACKEND_URL : window.location.origin;
+  const socketUrl = import.meta.env.VITE_WS_URL || import.meta.env.VITE_API_URL || defaultBase;
 
   if (!socketInstance) {
     socketInstance = io(socketUrl, {
