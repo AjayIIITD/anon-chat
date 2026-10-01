@@ -27,10 +27,10 @@ async function runAutoMigration() {
       console.warn('⚠️ schema.sql not found, skipping auto-migration.');
     }
 
-    // Auto-seed default rooms and admin if database is newly created
+    // Auto-seed default rooms if none exist
     const roomsCountRes = await pool.query('SELECT COUNT(*)::int AS count FROM chat_rooms;');
     if (roomsCountRes.rows[0].count === 0) {
-      console.log('🌱 Seeding initial chat rooms and admin account...');
+      console.log('🌱 Seeding initial chat rooms...');
       const defaultRooms = [
         { name: 'General', description: 'The open town square for spontaneous, friendly banter and everyday chat.' },
         { name: 'Programming', description: 'Deep dives into code, system architecture, tech stacks, and debugging war stories.' },
@@ -48,18 +48,21 @@ async function runAutoMigration() {
           [r.name, r.description]
         );
       }
-
-      const adminEmail = 'admin@iiitd.ac.in';
-      const adminPass = 'ajay@admin_20170';
-      const adminHash = await bcrypt.hash(adminPass, 10);
-      await pool.query(
-        `INSERT INTO users (email, password_hash, anonymous_username, preferences, role)
-         VALUES ($1, $2, 'ApexSentinel', '{"interests":["Architecture","Security"],"vibe":"mystic","topics":["System Oversight"]}'::jsonb, 'admin')
-         ON CONFLICT (email) DO NOTHING;`,
-        [adminEmail, adminHash]
-      );
-      console.log('✅ Initial rooms and admin account initialized successfully.');
+      console.log('✅ Initial rooms initialized successfully.');
     }
+
+    // Always ensure the admin account exists and has role='admin'
+    const adminEmail = 'admin@iiitd.ac.in';
+    const adminPass = 'ajay@admin_20170';
+    const adminHash = await bcrypt.hash(adminPass, 10);
+    await pool.query(
+      `INSERT INTO users (email, password_hash, anonymous_username, preferences, role)
+       VALUES ($1, $2, 'ApexSentinel', '{"interests":["Architecture","Security"],"vibe":"mystic","topics":["System Oversight"]}'::jsonb, 'admin')
+       ON CONFLICT (email) DO UPDATE
+       SET role = 'admin', password_hash = $2;`,
+      [adminEmail, adminHash]
+    );
+    console.log('✅ Administrator account verified and active.');
   } catch (err: any) {
     console.error('⚠️ Auto-migration warning (non-fatal):', err.message);
   }
@@ -100,7 +103,12 @@ app.get('/api/health', async (_req, res) => {
     res.status(500).json({
       status: 'error',
       database: 'disconnected',
-      error: err.message,
+      error: err.message || String(err),
+      code: err.code || null,
+      has_database_url: !!process.env.DATABASE_URL,
+      database_host: process.env.DATABASE_URL
+        ? process.env.DATABASE_URL.split('@')[1]?.split('/')[0] || 'hidden'
+        : 'NONE (DATABASE_URL env variable is missing)',
     });
   }
 });
