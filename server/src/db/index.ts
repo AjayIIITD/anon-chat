@@ -5,7 +5,10 @@ dotenv.config();
 
 const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/anon_chat';
 const isLocalhost = connectionString.includes('localhost') || connectionString.includes('127.0.0.1');
-const useSsl = !isLocalhost && (process.env.NODE_ENV === 'production' || !!process.env.RAILWAY_ENVIRONMENT || connectionString.includes('railway') || connectionString.includes('sslmode=require'));
+const isRailway = !!process.env.RAILWAY_ENVIRONMENT || connectionString.includes('railway') || connectionString.includes('rlwy.net');
+
+// Railway Postgres internal network and proxy do NOT require SSL. Only providers like Supabase or Neon require SSL.
+const useSsl = !isLocalhost && !isRailway && (connectionString.includes('sslmode=require') || connectionString.includes('supabase') || connectionString.includes('neon') || connectionString.includes('ssl=true'));
 
 export const pool = new Pool({
   connectionString,

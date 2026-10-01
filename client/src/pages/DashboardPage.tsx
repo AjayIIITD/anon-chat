@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, 
-  MessageSquare, 
-  Search, 
-  Compass, 
-  LogIn, 
-  ArrowRight, 
-  Sparkles, 
+import {
+  Users,
+  MessageSquare,
+  Search,
+  Compass,
+  LogIn,
+  ArrowRight,
+  Sparkles,
   CheckCircle2,
   AlertCircle,
   Radio,
@@ -116,7 +116,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
   const filteredRooms = rooms.filter(r => {
     const matchesSearch = r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (r.description && r.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    
+
     if (!matchesSearch) return false;
 
     const liveCount = getRoomLiveCount(r.id, r.live_count);
@@ -157,11 +157,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
                 </span>
               </div>
             </div>
-            
+
             <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
               Welcome, <span className="bg-gradient-to-r from-violet-400 via-indigo-200 to-cyan-300 bg-clip-text text-transparent">{user?.anonymous_username || 'Anonymous'}</span>
             </h1>
-            
+
             <p className="text-sm text-slate-300 mt-1 max-w-xl leading-relaxed">
               Explore public topic rooms, see who is currently active live, and engage in real-time anonymous banter.
             </p>
@@ -216,7 +216,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
 
                       {/* Live Badge on Joined Room Card */}
                       {liveCount > 0 ? (
-                        <span 
+                        <span
                           title={`Currently in room: ${liveUsers.join(', ')}`}
                           className="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold shadow-sm shadow-emerald-500/20 animate-pulse"
                         >
@@ -229,7 +229,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
                         </span>
                       )}
                     </div>
-                    
+
                     <p className="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">
                       {room.description || 'No description provided.'}
                     </p>
@@ -288,11 +288,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
               <button
                 id="filter-all-rooms-btn"
                 onClick={() => setFilterType('all')}
-                className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
-                  filterType === 'all'
-                    ? 'bg-violet-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white'
-                }`}
+                className={`px-3 py-1.5 rounded-lg font-medium transition-all ${filterType === 'all'
+                  ? 'bg-violet-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+                  }`}
               >
                 All ({rooms.length})
               </button>
@@ -300,11 +299,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
               <button
                 id="filter-live-rooms-btn"
                 onClick={() => setFilterType('live')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
-                  filterType === 'live'
-                    ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'text-emerald-400 hover:text-emerald-300'
-                }`}
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${filterType === 'live'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'text-emerald-400 hover:text-emerald-300'
+                  }`}
               >
                 <Flame className="w-3.5 h-3.5" />
                 <span>Live Now ({liveRooms.length})</span>
@@ -313,11 +311,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
               <button
                 id="filter-joined-rooms-btn"
                 onClick={() => setFilterType('joined')}
-                className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
-                  filterType === 'joined'
-                    ? 'bg-violet-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white'
-                }`}
+                className={`px-3 py-1.5 rounded-lg font-medium transition-all ${filterType === 'joined'
+                  ? 'bg-violet-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+                  }`}
               >
                 Joined ({joinedRooms.length})
               </button>
@@ -382,11 +379,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
               return (
                 <div
                   key={room.id}
-                  className={`glass-card p-6 rounded-2xl border transition-all flex flex-col justify-between ${
-                    liveCount > 0
-                      ? 'border-emerald-500/30 hover:border-emerald-500/50 shadow-lg shadow-emerald-950/20'
-                      : 'border-white/[0.08] hover:border-violet-500/30'
-                  }`}
+                  className={`glass-card p-6 rounded-2xl border transition-all flex flex-col justify-between ${liveCount > 0
+                    ? 'border-emerald-500/30 hover:border-emerald-500/50 shadow-lg shadow-emerald-950/20'
+                    : 'border-white/[0.08] hover:border-violet-500/30'
+                    }`}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2.5">
@@ -396,7 +392,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
 
                       {/* Prominent Live Indicator Badge */}
                       {liveCount > 0 ? (
-                        <div 
+                        <div
                           title={`Active users right now: ${liveUsers.join(', ')}`}
                           className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-bold shadow-sm shadow-emerald-500/25"
                         >
