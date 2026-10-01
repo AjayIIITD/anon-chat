@@ -230,9 +230,9 @@ router.post('/login', async (req, res): Promise<void> => {
         created_at: user.created_at,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Internal server error during login.' });
+    res.status(500).json({ error: error.message || 'Internal server error during login.' });
   }
 });
 

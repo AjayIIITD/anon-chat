@@ -22,6 +22,8 @@ async function runAutoMigration() {
     if (fs.existsSync(schemaPath)) {
       const schemaSql = fs.readFileSync(schemaPath, 'utf-8');
       await pool.query(schemaSql);
+      // Ensure dob column exists on legacy or pre-existing databases
+      await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS dob VARCHAR(20);`);
       console.log('✅ Database schema migration applied successfully.');
     } else {
       console.warn('⚠️ schema.sql not found, skipping auto-migration.');

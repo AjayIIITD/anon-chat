@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
     preferences JSONB NOT NULL DEFAULT '{"interests":[], "vibe":"chill", "topics":[]}'::jsonb,
     role VARCHAR(20) NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
     is_suspended BOOLEAN NOT NULL DEFAULT false,
+    dob VARCHAR(20),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
