@@ -8,7 +8,7 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   error: string | null;
-  login: (email: string, pass: string) => Promise<void>;
+  login: (email: string, pass: string) => Promise<User>;
   signup: (payload: { email: string; password: string; dob?: string; preferences: UserPreferences; chosen_username?: string }) => Promise<void>;
   logout: () => void;
   isLogoutModalOpen: boolean;
@@ -67,6 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setStoredToken(res.token);
       setToken(res.token);
       setUser(res.user);
+      return res.user;
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check credentials.');
       throw err;

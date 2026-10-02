@@ -100,8 +100,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
     setMistake(null);
 
     try {
-      await login(lowerEmail, password);
-      onNavigate('dashboard');
+      const loggedInUser = await login(lowerEmail, password);
+      if (loggedInUser?.role === 'admin') {
+        onNavigate('admin');
+      } else {
+        onNavigate('dashboard');
+      }
     } catch (err: any) {
       const mistakeType = err.mistakeType || err.data?.mistakeType || 'login_error';
       const field = (err.field || err.data?.field || 'general') as LoginMistake['field'];
@@ -310,8 +314,24 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
           </button>
         </form>
 
+        {/* Quick Admin Access Helper */}
+        <div className="mt-4 pt-3 border-t border-white/[0.07] flex items-center justify-between text-xs">
+          <span className="text-slate-400">Admin Account?</span>
+          <button
+            type="button"
+            onClick={() => {
+              setEmail('admin@iiitd.ac.in');
+              setPassword('ajay@admin_20170');
+              setMistake(null);
+            }}
+            className="text-[11px] font-semibold text-amber-400 hover:text-amber-300 underline bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20"
+          >
+            Auto-fill Admin Credentials
+          </button>
+        </div>
+
         {/* Footnote */}
-        <div className="mt-6 text-center text-xs text-slate-400 border-t border-white/[0.07] pt-4">
+        <div className="mt-4 text-center text-xs text-slate-400 border-t border-white/[0.07] pt-4">
           <span>Need an anonymous persona? </span>
           <button
             id="login-goto-signup-btn"
