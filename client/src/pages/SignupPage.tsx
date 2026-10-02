@@ -165,11 +165,11 @@ export const SignupPage: React.FC<SignupPageProps> = ({ onNavigate }) => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 relative">
+    <div className="min-h-[calc(100vh-4rem)] min-h-[calc(100dvh-4rem)] flex items-center justify-center px-3 sm:px-6 py-6 sm:py-12 relative">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[500px] bg-gradient-to-tr from-violet-600/10 via-indigo-600/10 to-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
 
-      <div className="w-full max-w-xl glass-panel p-6 sm:p-10 rounded-3xl border border-white/10 shadow-2xl relative">
+      <div className="w-full max-w-xl glass-panel p-5 sm:p-10 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl relative">
         {/* Step Progress Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-3">

@@ -59,12 +59,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onNavigate }) => {
   const isIIITDStudent = user.email?.toLowerCase().endsWith('iiitd.ac.in');
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-white tracking-tight">
+    <div className="max-w-4xl mx-auto px-3 sm:px-6 py-6 sm:py-16">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
           Personal Account & Persona
         </h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className="text-xs sm:text-sm text-slate-400 mt-1">
           Your persistent account credentials and public anonymous identity
         </p>
       </div>

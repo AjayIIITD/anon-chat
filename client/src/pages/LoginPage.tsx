@@ -142,12 +142,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
   const isPasswordMistake = mistake?.field === 'password' || mistake?.field === 'all';
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 relative">
+    <div className="min-h-[calc(100vh-4rem)] min-h-[calc(100dvh-4rem)] flex items-center justify-center px-3 sm:px-6 py-6 sm:py-12 relative">
       {/* Ambient background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[450px] bg-gradient-to-tr from-violet-600/10 via-indigo-600/10 to-cyan-500/10 rounded-full blur-[130px] pointer-events-none" />
 
       {/* Main Login Card */}
-      <div className="w-full max-w-md glass-panel p-6 sm:p-10 rounded-3xl border border-white/10 shadow-2xl relative">
+      <div className="w-full max-w-md glass-panel p-5 sm:p-10 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl relative">
         <div className="text-center mb-6">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 p-[1px] mx-auto mb-3 shadow-lg shadow-violet-500/20">
             <div className="w-full h-full bg-[#0b0f19] rounded-[15px] flex items-center justify-center">

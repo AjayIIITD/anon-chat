@@ -280,22 +280,22 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
   }, [showEmojiPicker]);
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col bg-[#07090e] overflow-hidden">
+    <div className="h-[calc(100vh-4rem)] h-[calc(100dvh-4rem)] flex flex-col bg-[#07090e] overflow-hidden">
       {/* Top Room Header Bar */}
-      <div className="glass-panel border-b border-white/[0.08] px-4 sm:px-6 py-3 flex items-center justify-between z-10 shrink-0">
-        <div className="flex items-center space-x-3 sm:space-x-4">
+      <div className="glass-panel border-b border-white/[0.08] px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between z-10 shrink-0">
+        <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
           <button
             id="chat-back-to-rooms-btn"
             onClick={() => onNavigate('dashboard')}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+            className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors shrink-0"
             title="Back to all rooms"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
-          <div>
-            <div className="flex items-center space-x-2.5">
-              <span className="font-extrabold text-base sm:text-lg text-white tracking-tight">
+          <div className="min-w-0">
+            <div className="flex items-center space-x-2">
+              <span className="font-extrabold text-sm sm:text-lg text-white tracking-tight truncate">
                 #{room?.name || 'Chat Room'}
               </span>
 
@@ -303,14 +303,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
               <button
                 id="chat-live-badge-btn"
                 onClick={() => setShowLiveBar(!showLiveBar)}
-                className="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-[11px] font-bold text-emerald-300 transition-all cursor-pointer shadow-sm shadow-emerald-500/10"
+                className="flex items-center space-x-1.5 px-2 sm:px-2.5 py-0.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-[10px] sm:text-[11px] font-bold text-emerald-300 transition-all cursor-pointer shadow-sm shadow-emerald-500/10 shrink-0"
                 title="Click to toggle currently live members bar"
               >
-                <span className="relative flex h-2 w-2">
+                <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-emerald-500"></span>
                 </span>
-                <span>{onlineCount} Currently Live</span>
+                <span>{onlineCount} Live</span>
               </button>
             </div>
 
@@ -321,11 +321,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
         </div>
 
         {/* Right action controls */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
           {!isConnected && (
-            <span className="hidden sm:flex items-center space-x-1 text-xs text-amber-400 font-medium px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20">
-              <WifiOff className="w-3.5 h-3.5" />
-              <span>Reconnecting...</span>
+            <span className="flex items-center space-x-1 text-[10px] sm:text-xs text-amber-400 font-medium px-1.5 sm:px-2 py-0.5 sm:py-1 rounded bg-amber-500/10 border border-amber-500/20">
+              <WifiOff className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span className="hidden xs:inline">Reconnecting...</span>
             </span>
           )}
 
@@ -335,14 +335,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
               setShowMembersDrawer(!showMembersDrawer);
               loadMembers();
             }}
-            className={`p-2 rounded-xl text-xs font-semibold border transition-all flex items-center space-x-1.5 ${
+            className={`p-1.5 sm:p-2 rounded-xl text-xs font-semibold border transition-all flex items-center space-x-1 sm:space-x-1.5 ${
               showMembersDrawer
                 ? 'bg-violet-600/20 border-violet-500/40 text-violet-300'
                 : 'bg-white/[0.04] border-white/10 text-slate-300 hover:text-white hover:bg-white/[0.08]'
             }`}
             title="Room Members"
           >
-            <Users className="w-4 h-4" />
+            <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Members</span>
             <span className="px-1.5 py-0.2 rounded-full bg-slate-800 text-[10px] text-slate-300 font-mono">
               {roomMembers.length}
@@ -352,10 +352,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
           <button
             id="chat-leave-room-btn"
             onClick={handleLeaveRoom}
-            className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all text-xs font-semibold flex items-center space-x-1.5"
+            className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all text-xs font-semibold flex items-center space-x-1 sm:space-x-1.5"
             title="Leave this room"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Leave</span>
           </button>
         </div>
@@ -363,19 +363,19 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
 
       {/* Interactive Currently Live Quick Banner */}
       {showLiveBar && (
-        <div className="bg-[#0b101c] border-b border-emerald-500/20 px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2 text-xs shrink-0 animate-fade-in">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="flex items-center space-x-1 text-emerald-400 font-bold">
-              <Radio className="w-3.5 h-3.5 animate-pulse text-emerald-400" />
-              <span>Currently Live ({onlineCount}):</span>
+        <div className="bg-[#0b101c] border-b border-emerald-500/20 px-3 sm:px-6 py-1.5 sm:py-2 flex items-center justify-between gap-2 text-xs shrink-0 animate-fade-in overflow-x-auto">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <span className="flex items-center space-x-1 text-emerald-400 font-bold shrink-0 text-[11px] sm:text-xs">
+              <Radio className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-pulse text-emerald-400" />
+              <span>Live ({onlineCount}):</span>
             </span>
 
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar py-0.5">
               {activeUsers.length > 0 ? (
                 activeUsers.map((name) => (
                   <span
                     key={name}
-                    className={`inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold border ${
+                    className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-mono font-semibold border shrink-0 ${
                       name === user?.anonymous_username
                         ? 'bg-violet-600/20 border-violet-500/40 text-violet-300'
                         : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
@@ -389,14 +389,14 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
                   </span>
                 ))
               ) : (
-                <span className="text-slate-400 text-[11px] italic">You are the only one in the room right now</span>
+                <span className="text-slate-400 text-[10px] sm:text-[11px] italic">Only you live</span>
               )}
             </div>
           </div>
 
           <button
             onClick={() => setShowLiveBar(false)}
-            className="text-[11px] text-slate-400 hover:text-slate-200 transition-colors underline"
+            className="text-[10px] sm:text-[11px] text-slate-400 hover:text-slate-200 transition-colors underline shrink-0 ml-1"
           >
             Dismiss
           </button>
@@ -612,8 +612,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
           )}
 
           {/* Bottom Message Input Bar */}
-          <div className={`p-4 sm:p-5 glass-panel border-t border-white/[0.08] bg-[#090d18]/90 ${replyTo ? 'pt-2' : ''}`}>
-            <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto flex items-end space-x-3">
+          <div className={`p-2.5 sm:p-4 md:p-5 glass-panel border-t border-white/[0.08] bg-[#090d18]/95 safe-bottom ${replyTo ? 'pt-1.5' : ''}`}>
+            <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto flex items-end space-x-2 sm:space-x-3">
               <div className="flex-1 relative">
                 <textarea
                   ref={inputRef}
@@ -622,11 +622,11 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
                   value={inputMessage}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
-                  placeholder={replyTo ? `Reply to ${replyTo.anonymous_username}...` : `Message #${room?.name || 'room'} anonymously... (Press Enter to send, Shift+Enter for newline)`}
+                  placeholder={replyTo ? `Reply to ${replyTo.anonymous_username}...` : `Message #${room?.name || 'room'}...`}
                   maxLength={2000}
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all resize-none max-h-32"
+                  className="w-full pl-3 pr-14 sm:px-4 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all resize-none max-h-32"
                 />
-                <span className="absolute right-3 bottom-2 text-[10px] text-slate-400 font-mono">
+                <span className="absolute right-2.5 sm:right-3 bottom-2 text-[9px] sm:text-[10px] text-slate-400 font-mono">
                   {inputMessage.length}/2000
                 </span>
               </div>
@@ -635,10 +635,10 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
                 id="chat-send-message-btn"
                 type="submit"
                 disabled={!inputMessage.trim() || sending}
-                className="p-3.5 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-600/30 transition-all disabled:opacity-40 disabled:hover:from-violet-600 shrink-0"
+                className="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-600/30 transition-all disabled:opacity-40 disabled:hover:from-violet-600 shrink-0"
                 title="Send message"
               >
-                <Send className="w-5 h-5" />
+                <Send className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </form>
           </div>
@@ -646,14 +646,27 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
 
         {/* Collapsible Right Drawer: Room Members Breakdown */}
         {showMembersDrawer && (
-          <aside className="w-72 glass-panel border-l border-white/[0.08] flex flex-col justify-between shrink-0 p-4 animate-fade-in">
-            <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-10rem)] pr-1">
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.07]">
-                <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-                  <Users className="w-4 h-4 text-violet-400" />
-                  <span>Room Members ({roomMembers.length})</span>
-                </h3>
-              </div>
+          <>
+            {/* Mobile backdrop */}
+            <div 
+              className="md:hidden fixed inset-0 z-30 bg-black/60 backdrop-blur-xs"
+              onClick={() => setShowMembersDrawer(false)}
+            />
+
+            <aside className="fixed inset-y-0 right-0 z-40 w-72 sm:w-80 md:static md:z-auto md:w-72 glass-panel border-l border-white/[0.08] flex flex-col justify-between shrink-0 p-4 animate-fade-in shadow-2xl md:shadow-none bg-[#0a0e19]">
+              <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-8rem)] md:max-h-[calc(100vh-10rem)] pr-1">
+                <div className="flex items-center justify-between pb-3 border-b border-white/[0.07]">
+                  <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+                    <Users className="w-4 h-4 text-violet-400" />
+                    <span>Room Members ({roomMembers.length})</span>
+                  </h3>
+                  <button
+                    onClick={() => setShowMembersDrawer(false)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 md:hidden"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
 
               {/* 1. CURRENTLY LIVE SECTION */}
               <div>
@@ -732,6 +745,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({ roomId, onNavigate }) => {
               All member credentials protected
             </div>
           </aside>
+          </>
         )}
       </div>
     </div>

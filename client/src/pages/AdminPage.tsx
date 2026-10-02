@@ -106,7 +106,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateHome }) => {
 
   return (
     <AdminGuard onNavigateHome={onNavigateHome}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12">
         <CreateRoomModal
           isOpen={isCreateOpen}
           onClose={() => setIsCreateOpen(false)}
@@ -128,13 +128,13 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onNavigateHome }) => {
         />
 
         {/* Admin Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div>
             <div className="flex items-center space-x-2">
               <span className="p-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400">
                 <Shield className="w-5 h-5" />
               </span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              <h1 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight">
                 Administrator Command Portal
               </h1>
             </div>

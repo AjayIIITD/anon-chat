@@ -16,44 +16,45 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate }) => {
         {/* Brand */}
         <div 
           onClick={() => onNavigate(user ? 'dashboard' : 'landing')}
-          className="flex items-center space-x-3 cursor-pointer group"
+          className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group shrink-0"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-cyan-500 p-[1px] shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/40 transition-all duration-300">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-cyan-500 p-[1px] shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/40 transition-all duration-300">
             <div className="w-full h-full bg-[#0b0f19] rounded-[11px] flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 text-violet-400 group-hover:scale-110 transition-transform duration-300" />
+              <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-violet-400 group-hover:scale-110 transition-transform duration-300" />
             </div>
           </div>
           <div className="flex flex-col">
-            <div className="flex items-center space-x-2">
-              <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+            <div className="flex items-center space-x-1.5 sm:space-x-2">
+              <span className="font-bold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
                 AnonChat
               </span>
-              <span className="text-[10px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-300 border border-violet-500/20">
+              <span className="hidden xs:inline-block text-[9px] sm:text-[10px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-300 border border-violet-500/20">
                 Incognito
               </span>
             </div>
-            <span className="text-[11px] text-slate-400 font-medium">
+            <span className="hidden sm:inline text-[11px] text-slate-400 font-medium">
               Zero-leak anonymous rooms
             </span>
           </div>
         </div>
 
         {/* Navigation / Actions */}
-        <div className="flex items-center space-x-3 sm:space-x-4">
+        <div className="flex items-center space-x-1.5 sm:space-x-3">
           {user ? (
             <>
               {/* Dashboard / Rooms link */}
               <button
                 id="nav-dashboard-btn"
                 onClick={() => onNavigate('dashboard')}
-                className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                title="Rooms"
+                className={`flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                   currentTab === 'dashboard'
                     ? 'bg-violet-600/20 text-violet-300 border border-violet-500/30'
                     : 'text-slate-300 hover:text-white hover:bg-white/[0.05]'
                 }`}
               >
                 <Compass className="w-4 h-4" />
-                <span className="hidden sm:inline">Rooms</span>
+                <span className="hidden md:inline">Rooms</span>
               </button>
 
               {/* Admin link (Only if admin role) */}
@@ -61,14 +62,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate }) => {
                 <button
                   id="nav-admin-btn"
                   onClick={() => onNavigate('admin')}
-                  className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  title="Admin Portal"
+                  className={`flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                     currentTab === 'admin'
                       ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm shadow-amber-500/10'
                       : 'text-amber-400/80 hover:text-amber-300 hover:bg-amber-500/10 border border-amber-500/20'
                   }`}
                 >
                   <Shield className="w-4 h-4 text-amber-400" />
-                  <span className="hidden sm:inline">Admin Portal</span>
+                  <span className="hidden md:inline">Admin</span>
                 </button>
               )}
 
@@ -76,17 +78,18 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate }) => {
               <button
                 id="nav-profile-btn"
                 onClick={() => onNavigate('profile')}
-                className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl border transition-all ${
+                title={`Profile: ${user.anonymous_username}`}
+                className={`flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-1.5 rounded-xl border transition-all max-w-[130px] sm:max-w-[200px] ${
                   currentTab === 'profile'
                     ? 'bg-violet-600/20 border-violet-500/50 text-white'
                     : 'bg-white/[0.03] border-white/10 hover:border-violet-500/30 text-slate-300 hover:text-white'
                 }`}
               >
-                <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-violet-500 to-cyan-500 flex items-center justify-center text-xs font-bold text-white shadow-sm">
+                <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-violet-500 to-cyan-500 flex items-center justify-center text-xs font-bold text-white shadow-sm shrink-0">
                   {user.anonymous_username.charAt(0).toUpperCase()}
                 </div>
-                <div className="flex flex-col items-start text-left">
-                  <span className="text-xs font-semibold tracking-wide">
+                <div className="flex flex-col items-start text-left truncate">
+                  <span className="text-xs font-semibold tracking-wide truncate max-w-[80px] sm:max-w-[140px]">
                     {user.anonymous_username}
                   </span>
                 </div>
@@ -97,7 +100,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate }) => {
                 id="nav-logout-btn"
                 onClick={openLogoutModal}
                 title="Log out"
-                className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all"
+                className="p-1.5 sm:p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all shrink-0"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -107,7 +110,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate }) => {
               <button
                 id="nav-login-btn"
                 onClick={() => onNavigate('login')}
-                className="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/[0.06] transition-all"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/[0.06] transition-all"
               >
                 Log In
               </button>
@@ -115,10 +118,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate }) => {
               <button
                 id="nav-signup-btn"
                 onClick={() => onNavigate('signup')}
-                className="flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-600/25 hover:shadow-violet-600/40 transition-all"
+                className="flex items-center space-x-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-600/25 hover:shadow-violet-600/40 transition-all"
               >
-                <Sparkles className="w-4 h-4 text-violet-200" />
-                <span>Get Anonymous ID</span>
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-violet-200" />
+                <span className="whitespace-nowrap">Join Incognito</span>
               </button>
             </>
           )}

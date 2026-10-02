@@ -35,33 +35,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         </div>
 
         {/* Main Title */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white mb-6 leading-[1.1]">
+        <h1 className="text-3xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-4 sm:mb-6 leading-[1.15] sm:leading-[1.1]">
           Speak Freely. <br />
           <span className="bg-gradient-to-r from-violet-400 via-indigo-300 to-cyan-400 bg-clip-text text-transparent">
             Remain Truly Anonymous.
           </span>
         </h1>
 
-        <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-300 mb-10 leading-relaxed font-normal">
+        <p className="max-w-2xl mx-auto text-sm sm:text-lg text-slate-300 mb-8 sm:mb-10 leading-relaxed font-normal px-2">
           A modern, persistent anonymous chatting platform. Connect in real-time topic rooms with an AI-synthesized persona based on your vibe. Your email and real identity are cryptographically locked and never revealed to anyone.
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 w-full max-w-md mx-auto sm:max-w-none">
           <button
             id="hero-start-chatting-btn"
             onClick={() => onNavigate('signup')}
-            className="w-full sm:w-auto flex items-center justify-center space-x-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-base shadow-xl shadow-violet-600/30 hover:shadow-violet-600/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+            className="w-full sm:w-auto flex items-center justify-center space-x-2.5 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-sm sm:text-base shadow-xl shadow-violet-600/30 hover:shadow-violet-600/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
           >
-            <Sparkles className="w-5 h-5 text-violet-200" />
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-violet-200" />
             <span>Start Chatting Anonymously</span>
-            <ArrowRight className="w-5 h-5 text-violet-200" />
+            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-violet-200" />
           </button>
 
           <button
             id="hero-login-btn"
             onClick={() => onNavigate('login')}
-            className="w-full sm:w-auto px-7 py-4 rounded-2xl glass-card hover:bg-white/[0.08] text-slate-200 font-semibold text-base border border-white/10 hover:border-violet-500/40 transition-all duration-300"
+            className="w-full sm:w-auto px-6 sm:px-7 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl glass-card hover:bg-white/[0.08] text-slate-200 font-semibold text-sm sm:text-base border border-white/10 hover:border-violet-500/40 transition-all duration-300"
           >
             Existing Member? Log In
           </button>

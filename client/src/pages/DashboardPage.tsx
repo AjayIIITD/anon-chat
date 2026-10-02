@@ -134,43 +134,43 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
   const liveRooms = rooms.filter(r => getRoomLiveCount(r.id, r.live_count) > 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12">
       {/* Welcome Banner */}
-      <div className="relative glass-panel p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl overflow-hidden mb-10">
+      <div className="relative glass-panel p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl overflow-hidden mb-8 sm:mb-10">
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-violet-600/15 via-cyan-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-3">
-              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-semibold">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="inline-flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-[11px] sm:text-xs font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span>Incognito Session Active</span>
               </div>
 
               {/* Platform-wide Live Telemetry Pill */}
-              <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold shadow-sm shadow-emerald-500/10">
+              <div className="inline-flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] sm:text-xs font-semibold shadow-sm shadow-emerald-500/10">
                 <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
                 <span>
                   {totalLiveUsersAcrossPlatform > 0
                     ? `${totalLiveUsersAcrossPlatform} user${totalLiveUsersAcrossPlatform === 1 ? '' : 's'} live right now`
-                    : 'Real-time presence monitoring'}
+                    : 'Presence monitoring active'}
                 </span>
               </div>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Welcome, <span className="bg-gradient-to-r from-violet-400 via-indigo-200 to-cyan-300 bg-clip-text text-transparent">{user?.anonymous_username || 'Anonymous'}</span>
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+              Welcome, <span className="bg-gradient-to-r from-violet-400 via-indigo-200 to-cyan-300 bg-clip-text text-transparent break-all">{user?.anonymous_username || 'Anonymous'}</span>
             </h1>
 
-            <p className="text-sm text-slate-300 mt-1 max-w-xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl leading-relaxed">
               Explore public topic rooms, see who is currently active live, and engage in real-time anonymous banter.
             </p>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 shrink-0">
             <button
               onClick={() => onNavigate('profile')}
-              className="flex items-center space-x-2 px-4 py-2.5 rounded-xl glass-card hover:bg-white/[0.08] text-xs font-semibold text-slate-200 border border-white/10 hover:border-violet-500/40 transition-all"
+              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl glass-card hover:bg-white/[0.08] text-xs font-semibold text-slate-200 border border-white/10 hover:border-violet-500/40 transition-all"
             >
               <Sparkles className="w-3.5 h-3.5 text-violet-400" />
               <span>Identity Profile</span>
@@ -180,25 +180,25 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
       </div>
 
       {error && (
-        <div className="mb-8 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center space-x-3 text-rose-300 text-sm">
-          <AlertCircle className="w-5 h-5 shrink-0 text-rose-400" />
+        <div className="mb-6 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center space-x-3 text-rose-300 text-xs sm:text-sm">
+          <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 text-rose-400" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Quick Access: Joined Rooms Strip */}
       {joinedRooms.length > 0 && filterType === 'all' && (
-        <div className="mb-10">
-          <div className="flex items-center justify-between mb-4">
+        <div className="mb-8 sm:mb-10">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div className="flex items-center space-x-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <h2 className="text-lg font-bold text-white tracking-tight">
+              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
                 Your Active Rooms ({joinedRooms.length})
               </h2>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {joinedRooms.map((room) => {
               const liveCount = getRoomLiveCount(room.id, room.live_count);
               const liveUsers = getRoomActiveUsers(room.id, room.active_users);
@@ -284,11 +284,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           {/* Search bar & Live Filters */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             {/* Filter pills */}
-            <div className="flex items-center p-1 rounded-xl bg-slate-900/80 border border-white/10 text-xs">
+            <div className="flex items-center p-1 rounded-xl bg-slate-900/80 border border-white/10 text-xs overflow-x-auto no-scrollbar max-w-full">
               <button
                 id="filter-all-rooms-btn"
                 onClick={() => setFilterType('all')}
-                className={`px-3 py-1.5 rounded-lg font-medium transition-all ${filterType === 'all'
+                className={`px-3 py-1.5 rounded-lg font-medium transition-all shrink-0 ${filterType === 'all'
                   ? 'bg-violet-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
                   }`}
@@ -299,19 +299,19 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
               <button
                 id="filter-live-rooms-btn"
                 onClick={() => setFilterType('live')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${filterType === 'live'
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg font-medium transition-all shrink-0 ${filterType === 'live'
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'text-emerald-400 hover:text-emerald-300'
                   }`}
               >
                 <Flame className="w-3.5 h-3.5" />
-                <span>Live Now ({liveRooms.length})</span>
+                <span>Live ({liveRooms.length})</span>
               </button>
 
               <button
                 id="filter-joined-rooms-btn"
                 onClick={() => setFilterType('joined')}
-                className={`px-3 py-1.5 rounded-lg font-medium transition-all ${filterType === 'joined'
+                className={`px-3 py-1.5 rounded-lg font-medium transition-all shrink-0 ${filterType === 'joined'
                   ? 'bg-violet-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
                   }`}
